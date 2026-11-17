@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+; Bypass Windows 11 hardware checks during setup
+; Use: In Windows 11 Setup, press Shift + F10, type "reg import bypass-setup-requirements.reg" (or "regedit" -> File -> Import)
+
+[HKEY_LOCAL_MACHINE\SYSTEM\Setup\LabConfig]
+"BypassTPMCheck"=dword:00000001
+"BypassSecureBootCheck"=dword:00000001
+"BypassRAMCheck"=dword:00000001
+"BypassCPUCheck"=dword:00000001
+"BypassStorageCheck"=dword:00000001
+"BypassDiskCheck"=dword:00000001
+
+; Bypass requirements for in-place upgrade
+[HKEY_LOCAL_MACHINE\SYSTEM\Setup\MoSetup]
+"AllowUpgradesWithUnsupportedTPMOrCPU"=dword:00000001

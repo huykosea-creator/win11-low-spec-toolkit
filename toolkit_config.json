@@ -1,0 +1,202 @@
+{
+  "_comment": "FILE CẤU HÌNH TRUNG TÂM - WINDOWS 11 TOOLKIT & HUB (Có thể sửa trực tiếp bằng Notepad/VS Code hoặc chỉnh trên giao diện WebUI)",
+  "version": "2.1.0",
+  "updated_at": "2026-11-08 18:20:44",
+  "general_workflow": {
+    "default_install_mode": "enterprise",
+    "filter_apps_by_mode": false,
+    "auto_check_network_on_startup": true,
+    "auto_provision_wifi_before_install": true,
+    "skip_wifi_if_ethernet_connected": true,
+    "skip_wifi_if_internet_available": true,
+    "install_delay_seconds": 3,
+    "create_desktop_shortcuts": true,
+    "timezone_default": "SE Asia Standard Time"
+  },
+  "wifi_config": {
+    "enabled": true,
+    "skip_if_ethernet_plugged": true,
+    "skip_if_already_online": true,
+    "only_import_detected_ap": true,
+    "auto_connect_matched_ap": true,
+    "connection_timeout_seconds": 12,
+    "access_points": [
+      {
+        "id": "ap_company_main",
+        "ssid": "CongTy_WiFi_5G",
+        "password": "MatKhauWiFiCongTy123@",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 1,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "enterprise",
+        "note": "Wi-Fi Văn phòng / Công ty chính (Chỉ tự nạp khi quét thấy sóng)"
+      },
+      {
+        "id": "ap_company_floor2",
+        "ssid": "VanPhong_Tang2",
+        "password": "12345678",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 2,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "enterprise",
+        "note": "Wi-Fi Chi nhánh / Tầng 2 (Chỉ tự nạp khi quét thấy sóng)"
+      },
+      {
+        "id": "ap_ktv_bench",
+        "ssid": "KTV_Test_WiFi",
+        "password": "88888888",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 3,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "all",
+        "note": "Wi-Fi Bàn Kỹ Thuật Viên cài máy"
+      }
+    ]
+  },
+  "install_profiles": {
+    "default_mode": "enterprise",
+    "enterprise": {
+      "id": "enterprise",
+      "name": "Doanh Nghiệp (Công ty / Văn phòng - 100% Miễn Phí Thương Mại)",
+      "badge": "🏢 Doanh Nghiệp",
+      "description": "Bộ 10 phần mềm & thư viện chuẩn văn phòng 100% miễn phí thương mại / mã nguồn mở (Không cần mua license): UniKey, Chrome, Firefox, LibreOffice (thay Office 365), 7-Zip (thay WinRAR), RustDesk (thay AnyDesk/TeamViewer), Foxit PDF Reader, VLC, cùng 2 gói thư viện nền tảng VC++ Redistributables (x64 & x86). Các phần mềm cần license (Office 365, WinRAR, AnyDesk, TeamViewer, Geek Uninstaller) chỉ tích chọn riêng khi công ty có mua bản quyền.",
+      "apps": [
+        "unikey",
+        "chrome",
+        "firefox",
+        "libreoffice",
+        "7zip",
+        "rustdesk",
+        "foxit-reader",
+        "vlc",
+        "vcredist-x64",
+        "vcredist-x86"
+      ]
+    },
+    "personal": {
+      "id": "personal",
+      "name": "Cá Nhân (Gia đình / Học tập / Giải trí)",
+      "badge": "👤 Cá Nhân",
+      "description": "Bộ 15 phần mềm & thư viện tiện dụng cho máy tính cá nhân, sinh viên và gia đình (Được phép dùng bản Personal Free): UniKey, Chrome, Cốc Cốc, 7-Zip, WinRAR, WPS Office (Văn phòng gọn nhẹ), UltraViewer, AnyDesk, TeamViewer, Foxit PDF Reader, VLC, Mem Reduct, Geek Uninstaller, cùng 2 gói thư viện nền tảng VC++ Redistributables (x64 & x86).",
+      "apps": [
+        "unikey",
+        "chrome",
+        "coccoc",
+        "7zip",
+        "winrar",
+        "wps-office",
+        "ultraviewer",
+        "anydesk",
+        "teamviewer",
+        "foxit-reader",
+        "vlc",
+        "mem-reduct",
+        "geek-uninstaller",
+        "vcredist-x64",
+        "vcredist-x86"
+      ]
+    }
+  },
+  "tweaks_config": {
+    "menu_show_delay_ms": 20,
+    "disable_transparency": true,
+    "hide_widgets_and_copilot": true,
+    "enable_game_mode": true,
+    "enable_ultimate_power": false
+  },
+  "default_install_mode": "enterprise",
+  "wifi_settings": {
+    "enabled": true,
+    "skip_if_ethernet_plugged": true,
+    "skip_if_already_online": true,
+    "only_import_detected_ap": true,
+    "auto_connect_matched_ap": true,
+    "connection_timeout_seconds": 12,
+    "access_points": [
+      {
+        "id": "ap_company_main",
+        "ssid": "CongTy_WiFi_5G",
+        "password": "MatKhauWiFiCongTy123@",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 1,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "enterprise",
+        "note": "Wi-Fi Văn phòng / Công ty chính (Chỉ tự nạp khi quét thấy sóng)"
+      },
+      {
+        "id": "ap_company_floor2",
+        "ssid": "VanPhong_Tang2",
+        "password": "12345678",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 2,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "enterprise",
+        "note": "Wi-Fi Chi nhánh / Tầng 2 (Chỉ tự nạp khi quét thấy sóng)"
+      },
+      {
+        "id": "ap_ktv_bench",
+        "ssid": "KTV_Test_WiFi",
+        "password": "88888888",
+        "auth": "WPA2PSK",
+        "cipher": "AES",
+        "priority": 3,
+        "auto_connect": true,
+        "hidden": false,
+        "scope": "all",
+        "note": "Wi-Fi Bàn Kỹ Thuật Viên cài máy"
+      }
+    ]
+  },
+  "wifi_access_points": [
+    {
+      "id": "ap_company_main",
+      "ssid": "CongTy_WiFi_5G",
+      "password": "MatKhauWiFiCongTy123@",
+      "auth": "WPA2PSK",
+      "cipher": "AES",
+      "priority": 1,
+      "auto_connect": true,
+      "hidden": false,
+      "scope": "enterprise",
+      "note": "Wi-Fi Văn phòng / Công ty chính (Chỉ tự nạp khi quét thấy sóng)"
+    },
+    {
+      "id": "ap_company_floor2",
+      "ssid": "VanPhong_Tang2",
+      "password": "12345678",
+      "auth": "WPA2PSK",
+      "cipher": "AES",
+      "priority": 2,
+      "auto_connect": true,
+      "hidden": false,
+      "scope": "enterprise",
+      "note": "Wi-Fi Chi nhánh / Tầng 2 (Chỉ tự nạp khi quét thấy sóng)"
+    },
+    {
+      "id": "ap_ktv_bench",
+      "ssid": "KTV_Test_WiFi",
+      "password": "88888888",
+      "auth": "WPA2PSK",
+      "cipher": "AES",
+      "priority": 3,
+      "auto_connect": true,
+      "hidden": false,
+      "scope": "all",
+      "note": "Wi-Fi Bàn Kỹ Thuật Viên cài máy"
+    }
+  ],
+  "workflow": {
+    "step0_auto_wifi_before_install": true,
+    "install_delay_seconds": 3
+  }
+}

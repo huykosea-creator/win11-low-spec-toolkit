@@ -1,0 +1,6 @@
+python311.zip
+.
+..
+
+# Run site.main() automatically
+import site

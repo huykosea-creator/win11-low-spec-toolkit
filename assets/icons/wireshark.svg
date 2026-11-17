@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="wsBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E88E5"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#wsBg)"/>
+  <!-- Shark fin & wave -->
+  <path d="M8 33h7c2-11 9-19 17-21-3 7-3 14-1 21h9" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M15 33c2-11 9-19 17-21-3 7-3 14-1 21H15z" fill="#64B5F6" opacity="0.85"/>
+  <path d="M8 38c4-2 8 2 12 0s8-2 12 0 6 2 8 0" fill="none" stroke="#90CAF9" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

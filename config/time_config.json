@@ -1,0 +1,5 @@
+{
+  "timezone": "SE Asia Standard Time",
+  "ntp_servers": "time.windows.com, time.google.com, pool.ntp.org",
+  "auto_sync": true
+}

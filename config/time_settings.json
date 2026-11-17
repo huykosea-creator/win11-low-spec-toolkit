@@ -1,0 +1,18 @@
+{
+  "mode": "auto",
+  "manual_datetime": "",
+  "manual_offset_minutes": 0,
+  "lock_duration_hours": 24,
+  "strict_machine_check": true,
+  "time_server_preset": "google_ntp",
+  "time_server_url": "time.google.com",
+  "server_drift_seconds": -0.87,
+  "last_sync_server_url": "time.google.com",
+  "last_sync_server_name": "Google Public NTP (Chuẩn nguyên tử - Đề xuất)",
+  "last_sync_server_time": "30/09/2026 03:29:37",
+  "last_sync_latency_ms": 65,
+  "last_sync_status": "connected",
+  "last_sync_error": "",
+  "last_updated": "2026-09-30T03:29:37.875285",
+  "last_sync_iso": "2026-09-30T03:29:37.871147"
+}

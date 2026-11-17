@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <rect x="4" y="4" width="40" height="40" rx="10" fill="#18181B"/>
+  <!-- Tailscale 3x3 mesh dots -->
+  <circle cx="15" cy="15" r="3.2" fill="#FFFFFF"/>
+  <circle cx="24" cy="15" r="3.2" fill="#FFFFFF"/>
+  <circle cx="33" cy="15" r="3.2" fill="#FFFFFF"/>
+  <circle cx="15" cy="24" r="3.2" fill="#71717A"/>
+  <circle cx="24" cy="24" r="3.2" fill="#38BDF8"/>
+  <circle cx="33" cy="24" r="3.2" fill="#71717A"/>
+  <circle cx="15" cy="33" r="3.2" fill="#71717A"/>
+  <circle cx="24" cy="33" r="3.2" fill="#FFFFFF"/>
+  <circle cx="33" cy="33" r="3.2" fill="#71717A"/>
+</svg>

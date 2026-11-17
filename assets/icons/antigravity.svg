@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="ag_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="ag_g1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="50%" stop-color="#9B72CB"/>
+      <stop offset="100%" stop-color="#D96570"/>
+    </linearGradient>
+    <linearGradient id="ag_g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34A853"/>
+      <stop offset="50%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="ag_spark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F43F5E"/>
+    </linearGradient>
+  </defs>
+  <!-- Google Antigravity Modern Badge & Delta Wing -->
+  <rect x="14" y="14" width="228" height="228" rx="52" fill="url(#ag_bg)"/>
+  <!-- Levitating Delta A-Wing -->
+  <path d="M128 44L52 196H88L128 112L168 196H204L128 44Z" fill="url(#ag_g1)"/>
+  <!-- Crossbar orbital arc -->
+  <path d="M76 164C98 146 158 146 180 164L166 184C148 171 108 171 90 184L76 164Z" fill="url(#ag_g2)"/>
+  <!-- Four-point AI star at apex -->
+  <path d="M190 48C190 61 197 68 210 68C197 68 190 75 190 88C190 75 183 68 170 68C183 68 190 61 190 48Z" fill="url(#ag_spark)"/>
+</svg>

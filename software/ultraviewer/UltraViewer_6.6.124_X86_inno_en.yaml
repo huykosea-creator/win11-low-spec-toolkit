@@ -1,0 +1,80 @@
+PackageIdentifier: DucFabulous.UltraViewer
+PackageVersion: 6.6.124
+Documentations:
+- DocumentLabel: FAQ
+  DocumentUrl: https://www.ultraviewer.net/en/faq.html
+Tags:
+- home-office
+- remote
+- remote-access
+- remote-assistance
+- remote-control
+- remote-desktop
+PackageLocale: en-US
+Author: DucFabulous Co., Ltd.
+Copyright: "Copyright \xA9 2012 - 2026 DucFabulous Co., Ltd."
+CopyrightUrl: https://www.ultraviewer.net/en/tos.html
+ShortDescription: A software that helps you to remote control your client's computer
+  to support them like you're sitting in front of the screen.
+License: Proprietary
+LicenseUrl: https://www.ultraviewer.net/en/tos.html
+PackageName: UltraViewer
+PackageUrl: https://www.ultraviewer.net/en/download.html
+PrivacyUrl: https://www.ultraviewer.net/en/privacy.html
+Publisher: DucFabulous
+PublisherSupportUrl: https://www.ultraviewer.net/en/contact.html
+PublisherUrl: https://www.ultraviewer.net/
+PurchaseUrl: https://www.ultraviewer.net/en/pricing.html
+ReleaseNotes: '- Added admin privilege check when setting up blacklist and whitelist'
+Localization:
+- Documentations:
+  - DocumentLabel: "\u5E38\u89C1\u95EE\u9898"
+    DocumentUrl: https://www.ultraviewer.net/cn/faq.html
+  Tags:
+  - "\u8FDC\u7A0B"
+  - "\u8FDC\u7A0B\u529E\u516C"
+  - "\u8FDC\u7A0B\u534F\u52A9"
+  - "\u8FDC\u7A0B\u63A7\u5236"
+  - "\u8FDC\u7A0B\u684C\u9762"
+  - "\u8FDC\u7A0B\u8BBF\u95EE"
+  - "\u8FDC\u7A0B\u8FDE\u63A5"
+  PackageLocale: zh-CN
+  CopyrightUrl: https://www.ultraviewer.net/cn/tos.html
+  ShortDescription: "\u4E00\u6B3E\u80FD\u8BA9\u4F60\u8FDC\u7A0B\u63A7\u5236\u5BA2\u6237\u7535\u8111\u7684\u8F6F\u4EF6,\u5982\u540C\u4EB2\u4E34\u73B0\u573A\u822C\u63D0\u4F9B\u6280\u672F\u652F\u6301\u3002"
+  License: "\u4E13\u6709\u8F6F\u4EF6"
+  LicenseUrl: https://www.ultraviewer.net/cn/tos.html
+  PackageUrl: https://www.ultraviewer.net/cn/download.html
+  PrivacyUrl: https://www.ultraviewer.net/cn/privacy.html
+  PublisherSupportUrl: https://www.ultraviewer.net/cn/contact.html
+  PublisherUrl: https://www.ultraviewer.net/cn/
+Installers:
+- Architecture: x86
+  InstallerType: inno
+  InstallerSha256: 020aac79a14717e316a593155ca778dd3e253b888bf62633b174838d35df7f41
+  InstallerUrl: https://dl2.ultraviewer.net/UltraViewer_setup_6.6_en.exe
+  InstallerLocale: en
+  ReleaseDate: 2025-07-19
+  InstallerAbortsTerminal: false
+  InstallLocationRequired: false
+  RequireExplicitUpgrade: false
+  DisplayInstallWarnings: false
+  DownloadCommandProhibited: false
+  ArchiveBinariesDependOnPath: false
+  ProductCode: '{E0FABD74-083B-47F4-AC5B-CA4237BF8913}_is1'
+  UpgradeBehavior: install
+  FileExtensions:
+  - uvr
+  ExpectedReturnCodes:
+  - InstallerReturnCode: 2
+    ReturnResponse: cancelledByUser
+  - InstallerReturnCode: 5
+    ReturnResponse: cancelledByUser
+  - InstallerReturnCode: 8
+    ReturnResponse: rebootRequiredForInstall
+  InstallerSwitches:
+    Silent: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+    SilentWithProgress: /SP- /SILENT /SUPPRESSMSGBOXES /NORESTART
+    Log: /LOG="<LOGPATH>"
+    InstallLocation: /DIR="<INSTALLPATH>"
+ManifestVersion: 1.12.0
+ManifestType: merged

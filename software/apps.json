@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Danh mục phần mềm cài đặt Windows 11",
+  "version": "2.0.0",
+  "updated_at": "2026-09-29",
+  "categories": [
+    "Nén & Giải nén",
+    "Gõ tiếng Việt",
+    "Trình duyệt Web",
+    "Điều khiển từ xa (Remote Desktop)",
+    "Đa phương tiện (Media Player)",
+    "Tài liệu & Văn phòng",
+    "Tiện ích & Quản lý RAM"
+  ],
+  "apps": [
+    {
+      "id": "winrar",
+      "name": "WinRAR (.rar)",
+      "category": "Nén & Giải nén",
+      "winget_id": "RARLab.WinRAR",
+      "homepage": "https://www.win-rar.com/",
+      "download_direct": "https://www.rarlab.com/download.htm",
+      "description": "Trình nén và giải nén chuẩn RAR/ZIP thông dụng nhất.",
+      "directory": "software/winrar"
+    },
+    {
+      "id": "unikey",
+      "name": "UniKey",
+      "category": "Gõ tiếng Việt",
+      "winget_id": "UniKey.UniKey",
+      "homepage": "https://www.unikey.vn/",
+      "download_direct": "https://www.unikey.vn/vietnam/#nav-download",
+      "description": "Bộ gõ tiếng Việt quốc dân của tác giả Phạm Kim Long.",
+      "directory": "software/unikey"
+    },
+    {
+      "id": "chrome",
+      "name": "Google Chrome",
+      "category": "Trình duyệt Web",
+      "winget_id": "Google.Chrome",
+      "homepage": "https://www.google.com/chrome/",
+      "download_direct": "https://www.google.com/chrome/",
+      "description": "Trình duyệt web phổ biến nhất, đồng bộ tài khoản Google toàn diện.",
+      "directory": "software/chrome"
+    },
+    {
+      "id": "firefox",
+      "name": "Mozilla Firefox",
+      "category": "Trình duyệt Web",
+      "winget_id": "Mozilla.Firefox",
+      "homepage": "https://www.mozilla.org/firefox/",
+      "download_direct": "https://www.mozilla.org/firefox/new/",
+      "description": "Trình duyệt web mã nguồn mở, bảo mật cao và nhân độc lập.",
+      "directory": "software/firefox"
+    },
+    {
+      "id": "ultraviewer",
+      "name": "UltraViewer",
+      "category": "Điều khiển từ xa (Remote Desktop)",
+      "winget_id": "DucFabulous.UltraViewer",
+      "homepage": "https://www.ultraviewer.net/",
+      "download_direct": "https://www.ultraviewer.net/vi/download.html",
+      "description": "Phần mềm điều khiển máy tính từ xa tiện lợi, hỗ trợ kỹ thuật phổ biến tại VN.",
+      "directory": "software/ultraviewer"
+    },
+    {
+      "id": "rustdesk",
+      "name": "RustDesk",
+      "category": "Điều khiển từ xa (Remote Desktop)",
+      "winget_id": "RustDesk.RustDesk",
+      "homepage": "https://rustdesk.com/",
+      "download_direct": "https://github.com/rustdesk/rustdesk/releases",
+      "description": "Remote desktop mã nguồn mở thay thế TeamViewer, bảo mật cao, hỗ trợ self-host.",
+      "directory": "software/rustdesk"
+    },
+    {
+      "id": "anydesk",
+      "name": "AnyDesk",
+      "category": "Điều khiển từ xa (Remote Desktop)",
+      "winget_id": "AnyDesk.AnyDesk",
+      "homepage": "https://anydesk.com/",
+      "download_direct": "https://anydesk.com/en/downloads/windows",
+      "description": "Điều khiển máy tính từ xa tốc độ cao, độ trễ thấp, file chạy siêu nhẹ (~5MB).",
+      "directory": "software/anydesk"
+    },
+    {
+      "id": "vlc",
+      "name": "VLC Media Player",
+      "category": "Đa phương tiện (Media Player)",
+      "winget_id": "VideoLAN.VLC",
+      "homepage": "https://www.videolan.org/vlc/",
+      "download_direct": "https://www.videolan.org/vlc/download-windows.html",
+      "description": "Trình phát mọi định dạng video/nhạc mã nguồn mở, tích hợp đầy đủ codec.",
+      "directory": "software/vlc-player"
+    },
+    {
+      "id": "foxit-reader",
+      "name": "Foxit PDF Reader",
+      "category": "Tài liệu & Văn phòng",
+      "winget_id": "Foxit.FoxitReader",
+      "homepage": "https://www.foxit.com/pdf-reader/",
+      "download_direct": "https://www.foxit.com/downloads/",
+      "description": "Trình đọc, xem và chú thích file PDF chuyên nghiệp, đầy đủ tính năng phổ biến nhất.",
+      "directory": "software/foxit-reader"
+    },
+    {
+      "id": "mem-reduct",
+      "name": "Mem Reduct",
+      "category": "Tiện ích & Quản lý RAM",
+      "winget_id": "Henry++.MemReduct",
+      "homepage": "https://www.henrypp.org/product/memreduct",
+      "download_direct": "https://github.com/henrypp/memreduct/releases",
+      "description": "Giải phóng RAM hệ thống định kỳ tự động, giảm tải tối đa cho máy ít RAM.",
+      "directory": "software/mem-reduct"
+    },
+    {
+      "id": "geek-uninstaller",
+      "name": "Geek Uninstaller",
+      "category": "Tiện ích & Quản lý RAM",
+      "winget_id": "GeekUninstaller.GeekUninstaller",
+      "homepage": "https://geekuninstaller.com/",
+      "download_direct": "https://geekuninstaller.com/download",
+      "description": "Gỡ sạch ứng dụng tận gốc và khóa registry thừa (bản Portable ~6MB).",
+      "directory": "software/geek-uninstaller"
+    },
+    {
+      "id": "libreoffice",
+      "name": "LibreOffice",
+      "category": "Tài liệu & Văn phòng",
+      "winget_id": "TheDocumentFoundation.LibreOffice",
+      "homepage": "https://www.libreoffice.org/",
+      "download_direct": "https://www.libreoffice.org/download/download-libreoffice/",
+      "description": "Bộ công cụ văn phòng mã nguồn mở đầy đủ Word, Excel, PowerPoint nhẹ máy.",
+      "directory": "software/libreoffice"
+    }
+  ]
+}

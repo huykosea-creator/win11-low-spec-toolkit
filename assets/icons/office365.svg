@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="m365_top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB900"/>
+      <stop offset="45%" stop-color="#EB3C00"/>
+      <stop offset="100%" stop-color="#D83B01"/>
+    </linearGradient>
+    <linearGradient id="m365_left" x1="0%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#7B2FF7"/>
+      <stop offset="55%" stop-color="#C2185B"/>
+      <stop offset="100%" stop-color="#EA4300"/>
+    </linearGradient>
+    <linearGradient id="m365_bot" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#5E35B1"/>
+      <stop offset="50%" stop-color="#0078D4"/>
+      <stop offset="100%" stop-color="#29B6F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Microsoft 365 Fluent Hex Ribbon -->
+  <g>
+    <!-- Left vertical/angled pillar -->
+    <path d="M128 18L40 69C31.3 74 26 83.3 26 93.3V162.7C26 172.7 31.3 182 40 187L78 209V101.5C78 93.4 82.3 85.9 89.3 81.9L166 37.6L142 23.8C133.3 18.8 122.7 18.8 128 18Z" fill="url(#m365_left)"/>
+    <!-- Top right ribbon -->
+    <path d="M114 21.8C122.7 16.8 133.3 16.8 142 21.8L216 64.5C224.7 69.5 230 78.8 230 88.8V158.5C230 144.5 222.5 131.6 210.4 124.6L142 85.1C133.3 80.1 122.7 80.1 114 85.1L89.3 99.4V81.9C89.3 73.8 93.6 66.3 100.6 62.3L114 21.8Z" fill="url(#m365_top)"/>
+    <!-- Bottom right turquoise-blue fold -->
+    <path d="M230 156V167.2C230 177.2 224.7 186.5 216 191.5L142 234.2C133.3 239.2 122.7 239.2 114 234.2L52 198.4C64 203.2 78 196.8 78 183V166.5L128 195.4L178 166.5V116L210.4 134.7C222.5 141.7 230 148 230 156Z" fill="url(#m365_bot)"/>
+  </g>
+</svg>
