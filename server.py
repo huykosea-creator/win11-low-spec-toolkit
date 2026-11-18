@@ -277,6 +277,7 @@ def run_command_with_live_logs(cmd_args: list, timeout: int = 300, on_progress=N
     try:
         proc = subprocess.Popen(
             cmd_args,
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -346,6 +347,8 @@ def run_command_with_live_logs(cmd_args: list, timeout: int = 300, on_progress=N
     t_reader.start()
 
     start_wait = time.time()
+    last_hb = start_wait
+    hb_pct = 15
     while True:
         if install_control["stopped"]:
             terminate_active_install_process(kill_tree=True)
@@ -368,13 +371,31 @@ def run_command_with_live_logs(cmd_args: list, timeout: int = 300, on_progress=N
                 install_control["current_proc"] = None
             return rc, ""
 
-        if time.time() - start_wait > timeout:
+        now_wait = time.time()
+        if now_wait - start_wait > timeout:
             add_log(f"[CẢNH BÁO] Quá thời gian cài đặt tối đa ({timeout}s), tự động giải phóng tiến trình...")
             terminate_active_install_process(kill_tree=True)
             t_reader.join(timeout=1.5)
             with install_control["lock"]:
                 install_control["current_proc"] = None
             return -999, "Timeout"
+
+        if on_progress and (now_wait - last_hb >= 3.0):
+            last_hb = now_wait
+            elapsed_s = int(now_wait - start_wait)
+            hb_pct = min(82, hb_pct + 2)
+            try:
+                with install_lock:
+                    cur_sub = int(install_state.get("sub_progress") or 0)
+                    if cur_sub < hb_pct:
+                        install_state["sub_progress"] = hb_pct
+                        install_state["sub_detail"] = f"Đang xử lý ({elapsed_s}s)..."
+                        idx_cur = int(install_state.get("current_index") or 0)
+                        q_list = install_state.get("queue") or []
+                        if 1 <= idx_cur <= len(q_list):
+                            q_list[idx_cur - 1]["sub_progress"] = hb_pct
+            except Exception:
+                pass
 
         time.sleep(0.25)
 
@@ -758,18 +779,47 @@ def run_sequential_install(app_items: list, delay_seconds: int = 3) -> None:
                         add_log(f"[LỖI] Xảy ra lỗi khi cài {app_name}: {exc}")
 
             # 2. Các bộ cài Offline (.exe / .msi) có sẵn trong thư mục software/<app_id>
+            # Hỗ trợ cả file config app: config.json / installer.json / app.json nếu KTV muốn tùy chỉnh cờ lệnh
             if not is_direct_handled and os.path.isdir(software_app_dir):
-                candidate_files = [
-                    f for f in os.listdir(software_app_dir)
-                    if f.lower().endswith((".exe", ".msi"))
-                ]
+                cfg_installer = None
+                for cfg_name in ("config.json", "installer.json", "app.json", "setup.json"):
+                    cfg_p = os.path.join(software_app_dir, cfg_name)
+                    if os.path.isfile(cfg_p):
+                        try:
+                            with open(cfg_p, "r", encoding="utf-8") as cfp:
+                                cfg_installer = json.load(cfp)
+                            break
+                        except Exception:
+                            pass
+
+                candidate_files = []
+                specified_file = ""
+                custom_args = None
+                if isinstance(cfg_installer, dict):
+                    specified_file = cfg_installer.get("file") or cfg_installer.get("installer") or ""
+                    custom_args = cfg_installer.get("args") or cfg_installer.get("arguments")
+
+                if specified_file and os.path.isfile(os.path.join(software_app_dir, specified_file)):
+                    candidate_files = [specified_file]
+                else:
+                    candidate_files = [
+                        f for f in os.listdir(software_app_dir)
+                        if f.lower().endswith((".exe", ".msi"))
+                    ]
+
                 if candidate_files:
                     target_file = os.path.join(software_app_dir, candidate_files[0])
                     fname_lower = candidate_files[0].lower()
                     add_log(f"   -> Phát hiện bộ cài offline {app_name}: software/{app_id}/{candidate_files[0]}")
                     on_app_progress(40, "Cài offline...", "installing")
 
-                    if fname_lower.endswith(".msi"):
+                    if custom_args is not None:
+                        if isinstance(custom_args, list):
+                            cmd = [target_file] + [str(a) for a in custom_args]
+                        else:
+                            import shlex
+                            cmd = [target_file] + shlex.split(str(custom_args))
+                    elif fname_lower.endswith(".msi"):
                         cmd = ["msiexec.exe", "/i", target_file, "/qn", "/norestart"]
                     elif app_id == "rustdesk":
                         cmd = [target_file, "--silent-install"]
@@ -796,8 +846,10 @@ def run_sequential_install(app_items: list, delay_seconds: int = 3) -> None:
                         cmd = [target_file, "/SP-", "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/NOCANCEL"]
                     elif app_id in ("chrome", "coccoc") or "google" in fname_lower:
                         cmd = [target_file, "/silent", "/install"]
-                    elif app_id in ("winrar", "7zip"):
+                    elif app_id in ("winrar", "7zip", "foxit-reader", "notepadplusplus", "vlc", "libreoffice"):
                         cmd = [target_file, "/S"]
+                    elif "inno" in fname_lower:
+                        cmd = [target_file, "/VERYSILENT", "/NORESTART", "/SP-"]
                     else:
                         cmd = [target_file, "/S"]
 
@@ -825,6 +877,8 @@ def run_sequential_install(app_items: list, delay_seconds: int = 3) -> None:
                     "--accept-package-agreements",
                     "--accept-source-agreements",
                 ]
+                if "." in package_id:
+                    cmd.extend(["--source", "winget"])
                 if package_id == "UniKey.UniKey":
                     cmd.extend(["-v", "4.6.230919"])
 
@@ -1490,23 +1544,24 @@ class ToolkitRequestHandler(SimpleHTTPRequestHandler):
         if not path.startswith("/api/"):
             return super().do_GET()
 
-        # Hot-reload các module dữ liệu nếu đang phát triển
-        for mod_name in (
-            "scripts.scan_manager",
-            "scripts.hardware_monitor_service",
-            "scripts.disk_scanner",
-            "scripts.scan_installed",
-            "scripts.app_detector",
-            "scripts.shortcut_manager",
-            "scripts.config_manager",
-            "scripts.wifi_manager",
-            "scripts.network_service",
-        ):
-            if mod_name in sys.modules:
-                try:
-                    importlib.reload(sys.modules[mod_name])
-                except Exception:
-                    pass
+        # Chỉ hot-reload khi bật TOOLKIT_DEV_RELOAD=1 để tránh xung đột đa luồng khi tải trang lần đầu
+        if os.environ.get("TOOLKIT_DEV_RELOAD") == "1":
+            for mod_name in (
+                "scripts.scan_manager",
+                "scripts.hardware_monitor_service",
+                "scripts.disk_scanner",
+                "scripts.scan_installed",
+                "scripts.app_detector",
+                "scripts.shortcut_manager",
+                "scripts.config_manager",
+                "scripts.wifi_manager",
+                "scripts.network_service",
+            ):
+                if mod_name in sys.modules:
+                    try:
+                        importlib.reload(sys.modules[mod_name])
+                    except Exception:
+                        pass
 
         try:
             # 1. Trạng thái Runner
@@ -1609,12 +1664,6 @@ class ToolkitRequestHandler(SimpleHTTPRequestHandler):
                 return self._send_json(handle_install_control(action, target_idx))
 
             if path == "/api/install_batch":
-                with install_lock:
-                    if install_state["status"] in ("installing", "paused"):
-                        return self._send_json(
-                            {"status": "error", "message": "Dang co tien trinh cai dat dang chay!"},
-                            status_code=400,
-                        )
                 raw_items = params.get("items", ["[]"])[0]
                 app_items = json.loads(raw_items)
                 if not isinstance(app_items, list) or not app_items:
@@ -1623,6 +1672,21 @@ class ToolkitRequestHandler(SimpleHTTPRequestHandler):
                         status_code=400,
                     )
                 delay_val = max(0, min(30, int(params.get("delay", ["3"])[0] or 3)))
+                with install_lock:
+                    if install_state["status"] in ("installing", "paused"):
+                        return self._send_json(
+                            {"status": "error", "message": "Dang co tien trinh cai dat dang chay!"},
+                            status_code=400,
+                        )
+                    install_state.update({
+                        "status": "installing",
+                        "step_status": "installing",
+                        "total_apps": len(app_items),
+                        "current_index": 0,
+                        "current_app": str((app_items[0] or {}).get("name", "Đang khởi tạo...")) if isinstance(app_items[0], dict) else "Đang khởi tạo...",
+                        "current_stage": "Đang khởi tạo tiến trình cài đặt...",
+                        "sub_progress": 5,
+                    })
                 t = threading.Thread(target=run_sequential_install, args=(app_items, delay_val), daemon=True)
                 t.start()
                 return self._send_json({"status": "started", "total": len(app_items)})
@@ -2605,6 +2669,68 @@ class LocalThreadingServer(ThreadingHTTPServer):
         super().handle_error(request, client_address)
 
 
+def _open_toolkit_browser_when_ready(url: str) -> None:
+    """Đợi server sẵn sàng rồi mở trình duyệt, bỏ qua màn hình First-Run / Đồng bộ trên Windows mới."""
+    import socket as _sock
+    deadline = time.time() + 5.0
+    while time.time() < deadline:
+        s = _sock.socket(_sock.AF_INET, _sock.SOCK_STREAM)
+        s.settimeout(0.3)
+        try:
+            s.connect((HOST, PORT))
+            s.close()
+            break
+        except Exception:
+            try:
+                s.close()
+            except Exception:
+                pass
+            time.sleep(0.1)
+
+    if os.name == "nt":
+        prog_id = ""
+        try:
+            import winreg
+            with winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice",
+            ) as k:
+                prog_id = str(winreg.QueryValueEx(k, "ProgId")[0] or "")
+        except Exception:
+            prog_id = ""
+
+        edge_paths = [
+            os.path.expandvars(r"%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"),
+            os.path.expandvars(r"%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"),
+            os.path.expandvars(r"%LocalAppData%\Microsoft\Edge\Application\msedge.exe"),
+        ]
+        chrome_paths = [
+            os.path.expandvars(r"%ProgramFiles%\Google\Chrome\Application\chrome.exe"),
+            os.path.expandvars(r"%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"),
+            os.path.expandvars(r"%LocalAppData%\Google\Chrome\Application\chrome.exe"),
+        ]
+
+        browser_exe = None
+        extra_flags = ["--no-first-run", "--no-default-browser-check"]
+        if "chrome" in prog_id.lower():
+            browser_exe = next((p for p in chrome_paths if os.path.isfile(p)), None)
+        elif "edge" in prog_id.lower() or not prog_id:
+            browser_exe = next((p for p in edge_paths if os.path.isfile(p)), None)
+            extra_flags.append("--disable-features=msEdgeFRE,msEdgeFreWelcomePage")
+
+        if browser_exe:
+            try:
+                subprocess.Popen([browser_exe, *extra_flags, url], close_fds=True)
+                return
+            except Exception:
+                pass
+
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
+
+
 def main() -> None:
     print("==================================================================")
     print("   WINDOWS 11 TOOLKIT & HUB - LOCAL WEBUI SERVER (127.0.0.1)")
@@ -2614,7 +2740,7 @@ def main() -> None:
     print("==================================================================")
 
     httpd = LocalThreadingServer((HOST, PORT), ToolkitRequestHandler)
-    threading.Timer(0.8, lambda: webbrowser.open(f"http://localhost:{PORT}/")).start()
+    threading.Thread(target=_open_toolkit_browser_when_ready, args=(f"http://localhost:{PORT}/",), daemon=True).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

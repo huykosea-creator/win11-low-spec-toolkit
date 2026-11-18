@@ -3514,7 +3514,7 @@ function startSequentialInstall() {
   };
   syncInstallModeScanGuardUI(window.lastInstallState);
 
-  fetch(`/api/install_batch?delay=${installDelay}&items=${encodeURIComponent(JSON.stringify(itemsToInstall))}`)
+  fetch(`/api/install_batch?delay=${installDelay}&items=${encodeURIComponent(JSON.stringify(itemsToInstall))}`, { cache: "no-store" })
     .then(res => res.json())
     .then(data => {
       if (data.status === "started") {
@@ -3949,13 +3949,18 @@ function renderModalQueue(queue, currentIndex, overallStatus) {
   container.innerHTML = html;
 }
 
+let isPollingInstallProgress = false;
+
 function startPollingProgress() {
   if (pollInterval) clearInterval(pollInterval);
+  updateInstallProgress();
   pollInterval = setInterval(updateInstallProgress, 1000);
 }
 
 function updateInstallProgress() {
-  fetch("/api/install_progress")
+  if (isPollingInstallProgress) return;
+  isPollingInstallProgress = true;
+  fetch(`/api/install_progress?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(data => {
       const fill = document.getElementById("modalProgressFill");
@@ -4100,7 +4105,10 @@ function updateInstallProgress() {
       syncFloatingInstallWidget(data);
       syncInstallModeScanGuardUI(data);
     })
-    .catch(() => {});
+    .catch(() => {})
+    .finally(() => {
+      isPollingInstallProgress = false;
+    });
 }
 
 function checkActiveInstallState() {
