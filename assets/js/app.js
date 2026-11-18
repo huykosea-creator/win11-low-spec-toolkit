@@ -15404,6 +15404,7 @@ document.addEventListener('keydown', function(e) {
     closeEditKtvTaskModal();
     closeInstallModeBlockModal();
     closeConfirmScanMachineModal();
+    closeSoftwareUpdaterModal();
     const instModal = document.getElementById('installModal');
     if (instModal && instModal.classList.contains('active')) {
       closeModal();
@@ -15423,6 +15424,249 @@ window.addEventListener('resize', function() {
   hideAppContextMenu();
   hideKtvContextMenu();
 });
+
+/* ========================================================
+   TRUNG TÂM KIỂM TRA & ĐỒNG BỘ CẬP NHẬT BỘ CÀI OFFLINE (SOFTWARE UPDATER)
+   ======================================================== */
+let softwareUpdaterCache = null;
+let softwareUpdaterSyncPolling = null;
+let isSoftwareUpdaterSyncPaused = false;
+
+function openSoftwareUpdaterModal() {
+  const modal = document.getElementById('softwareUpdaterModal');
+  if (modal) modal.style.display = 'flex';
+  if (!softwareUpdaterCache) {
+    checkSoftwareUpdatesOnline();
+  } else {
+    renderSoftwareUpdaterTable(softwareUpdaterCache);
+  }
+}
+
+function closeSoftwareUpdaterModal() {
+  const modal = document.getElementById('softwareUpdaterModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function closeSoftwareUpdaterModalOnBackdrop(e) {
+  if (e.target && e.target.id === 'softwareUpdaterModal') {
+    closeSoftwareUpdaterModal();
+  }
+}
+
+async function checkSoftwareUpdatesOnline() {
+  const container = document.getElementById('updaterItemsTableContainer');
+  const badgeLatest = document.getElementById('updaterStatLatest');
+  const badgeOutdated = document.getElementById('updaterStatOutdated');
+  const badgeMissing = document.getElementById('updaterStatMissing');
+  const summaryBadge = document.getElementById('updaterSummaryBadge');
+
+  if (container) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:35px; color:#64748b; font-size:13px;">
+        <div style="font-size:26px; margin-bottom:8px;">⏳</div>
+        <div style="font-weight:700; color:#0369a1;">Đang kết nối API chính hãng để kiểm tra phiên bản mới nhất...</div>
+        <div style="font-size:11.5px; margin-top:4px; color:#94a3b8;">(Truy vấn Google, Mozilla, GitHub, 7-Zip & Microsoft CDN)</div>
+      </div>
+    `;
+  }
+
+  try {
+    const res = await fetch(`/api/software_updater/check?t=${Date.now()}`, { cache: 'no-store' });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      softwareUpdaterCache = data;
+      renderSoftwareUpdaterTable(data);
+
+      if (badgeLatest) badgeLatest.innerText = `${data.latest_count || 0} Bản Mới Nhất`;
+      if (badgeOutdated) badgeOutdated.innerText = `${data.outdated_count || 0} Bản Cũ`;
+      if (badgeMissing) badgeMissing.innerText = `${data.missing_count || 0} Chưa Tải`;
+
+      const needAttention = (data.outdated_count || 0) + (data.missing_count || 0);
+      if (summaryBadge) {
+        if (needAttention > 0) {
+          summaryBadge.style.display = 'inline-block';
+          summaryBadge.innerText = `${needAttention}`;
+        } else {
+          summaryBadge.style.display = 'none';
+        }
+      }
+    } else {
+      if (container) container.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;">⚠️ Lỗi: ${data.message || 'Không thể kiểm tra cập nhật'}</div>`;
+    }
+  } catch (err) {
+    if (container) container.innerHTML = `<div style="text-align:center; padding:30px; color:#ef4444;">⚠️ Lỗi kết nối tới server.py</div>`;
+  }
+}
+
+function renderSoftwareUpdaterTable(data) {
+  const container = document.getElementById('updaterItemsTableContainer');
+  if (!container || !data || !Array.isArray(data.items)) return;
+
+  const items = data.items;
+  let html = `
+    <table style="width:100%; border-collapse:collapse; font-size:12.5px; text-align:left;">
+      <thead>
+        <tr style="border-bottom:2px solid #e2e8f0; color:#475569; font-size:11.5px; text-transform:uppercase;">
+          <th style="padding:8px 10px; width:40px; text-align:center;">
+            <input type="checkbox" id="chkSelectAllUpdater" checked onchange="toggleSelectAllUpdaterApps(this.checked)" title="Chọn / Bỏ chọn tất cả">
+          </th>
+          <th style="padding:8px 10px;">Phần Mềm</th>
+          <th style="padding:8px 10px;">Bản Hiện Có (software/)</th>
+          <th style="padding:8px 10px;">Bản Mới Nhất</th>
+          <th style="padding:8px 10px; text-align:center;">Trạng Thái</th>
+          <th style="padding:8px 10px; text-align:right;">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  items.forEach(it => {
+    let badgeHtml = '';
+    let isChecked = false;
+    if (it.status_badge === 'missing') {
+      badgeHtml = `<span class="badge badge-danger" style="font-size:10.5px;">Chưa Tải</span>`;
+      isChecked = true;
+    } else if (it.status_badge === 'outdated') {
+      badgeHtml = `<span class="badge badge-warning" style="font-size:10.5px;">Có Bản Mới</span>`;
+      isChecked = true;
+    } else {
+      badgeHtml = `<span class="badge badge-mint" style="font-size:10.5px;">Mới Nhất</span>`;
+      isChecked = false;
+    }
+
+    const localText = it.has_offline
+      ? `<strong>${escapeHtml(it.local_version)}</strong> <span style="font-size:11px; color:#64748b;">(${it.filesize_mb} MB)</span>`
+      : `<span style="color:#ef4444; font-style:italic;">Chưa có trong software/</span>`;
+
+    html += `
+      <tr style="border-bottom:1px solid #f1f5f9; hover:background:#f8fafc;">
+        <td style="padding:10px; text-align:center;">
+          <input type="checkbox" class="chk-updater-item" data-appid="${it.id}" ${isChecked ? 'checked' : ''}>
+        </td>
+        <td style="padding:10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="${getAppIconPath(it.id)}" style="width:20px; height:20px; object-fit:contain;" onerror="this.outerHTML='📦'">
+            <div>
+              <div style="font-weight:700; color:#0f172a;">${escapeHtml(it.name)}</div>
+              <div style="font-size:11px; color:#64748b;">${escapeHtml(it.category || '')}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding:10px;">${localText}</td>
+        <td style="padding:10px;"><strong style="color:#0369a1;">${escapeHtml(it.latest_version)}</strong></td>
+        <td style="padding:10px; text-align:center;">${badgeHtml}</td>
+        <td style="padding:10px; text-align:right;">
+          <button type="button" class="btn btn-outline" onclick="syncSingleAppDirect('${it.id}')" style="font-size:11px; padding:3px 9px;" title="Tải ngay bộ cài mới nhất của ${escapeHtml(it.name)}">
+            ⬇️ Tải Ngay
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+}
+
+function toggleSelectAllUpdaterApps(checked) {
+  document.querySelectorAll('.chk-updater-item').forEach(chk => chk.checked = checked);
+}
+
+function syncSingleAppDirect(appId) {
+  startSyncSelectedApps([appId]);
+}
+
+async function startSyncSelectedApps(specifiedIds = null) {
+  let targetIds = [];
+  if (Array.isArray(specifiedIds) && specifiedIds.length > 0) {
+    targetIds = specifiedIds;
+  } else {
+    document.querySelectorAll('.chk-updater-item:checked').forEach(chk => {
+      const id = chk.getAttribute('data-appid');
+      if (id) targetIds.push(id);
+    });
+  }
+
+  if (targetIds.length === 0) {
+    showToast('Vui lòng tích chọn ít nhất 1 phần mềm để đồng bộ tải về!');
+    return;
+  }
+
+  const pBox = document.getElementById('updaterSyncProgressBox');
+  if (pBox) pBox.style.display = 'block';
+
+  try {
+    const res = await fetch(`/api/software_updater/start_sync?apps=${encodeURIComponent(JSON.stringify(targetIds))}`);
+    const data = await res.json();
+    if (data.status === 'started') {
+      showToast(`⚡ Đang bắt đầu đồng bộ tải về ${data.total} phần mềm...`);
+      startPollingSoftwareUpdaterProgress();
+    } else {
+      showToast('⚠️ ' + (data.message || 'Không thể khởi động đồng bộ'));
+    }
+  } catch (err) {
+    showToast('⚠️ Lỗi kết nối khi khởi động đồng bộ');
+  }
+}
+
+function startPollingSoftwareUpdaterProgress() {
+  if (softwareUpdaterSyncPolling) clearInterval(softwareUpdaterSyncPolling);
+  softwareUpdaterSyncPolling = setInterval(updateSoftwareUpdaterSyncUI, 800);
+}
+
+async function updateSoftwareUpdaterSyncUI() {
+  const pBox = document.getElementById('updaterSyncProgressBox');
+  const titleEl = document.getElementById('updaterActiveAppTitle');
+  const speedEl = document.getElementById('updaterActiveAppSpeed');
+  const fillEl = document.getElementById('updaterSyncProgressFill');
+  const detailEl = document.getElementById('updaterSyncDetailText');
+  const btnPause = document.getElementById('btnPauseSync');
+
+  try {
+    const res = await fetch(`/api/software_updater/progress?t=${Date.now()}`, { cache: 'no-store' });
+    const st = await res.json();
+
+    if (st.status === 'syncing') {
+      if (pBox) pBox.style.display = 'block';
+      if (titleEl) titleEl.innerText = `⏳ [${st.current_index}/${st.total_apps}] Đang tải: ${st.current_app_name} (${st.current_file})`;
+      if (speedEl) speedEl.innerText = `${st.speed_kbps || 0} KB/s • Tiến độ: ${st.progress_percent || 0}% • Còn ~${st.eta_seconds || 0}s`;
+      if (fillEl) fillEl.style.width = `${st.progress_percent || 0}%`;
+      const mbLoaded = (st.downloaded_bytes / (1024 * 1024)).toFixed(1);
+      const mbTotal = (st.total_bytes / (1024 * 1024)).toFixed(1);
+      if (detailEl) detailEl.innerText = `Đã tải: ${mbLoaded} MB / ${mbTotal > 0 ? mbTotal + ' MB' : 'Đang tính toán'} -> software/${st.current_app_id}/`;
+    } else if (st.status === 'completed') {
+      clearInterval(softwareUpdaterSyncPolling);
+      softwareUpdaterSyncPolling = null;
+      if (fillEl) fillEl.style.width = '100%';
+      if (titleEl) titleEl.innerText = '🎉 ĐÃ HOÀN TẤT ĐỒNG BỘ!';
+      if (speedEl) speedEl.innerText = `Đã tải ${st.synced_apps ? st.synced_apps.length : 0} phần mềm`;
+      if (detailEl) detailEl.innerText = 'Toàn bộ bộ cài offline đã sẵn sàng trong thư mục software/ để đi cài máy!';
+      showToast('🎉 Đồng bộ tải về các bộ cài offline thành công!');
+      setTimeout(() => {
+        checkSoftwareUpdatesOnline();
+      }, 1500);
+    } else if (st.status === 'stopped') {
+      clearInterval(softwareUpdaterSyncPolling);
+      softwareUpdaterSyncPolling = null;
+      if (titleEl) titleEl.innerText = '⏹️ ĐÃ DỪNG TIẾN TRÌNH';
+      if (detailEl) detailEl.innerText = 'Tiến trình đồng bộ đã dừng theo yêu cầu.';
+      showToast('⏹️ Đã dừng đồng bộ.');
+    }
+  } catch (err) {}
+}
+
+async function pauseOrResumeSync() {
+  const btn = document.getElementById('btnPauseSync');
+  const action = isSoftwareUpdaterSyncPaused ? 'resume' : 'pause';
+  await fetch(`/api/software_updater/control?action=${action}`);
+  isSoftwareUpdaterSyncPaused = !isSoftwareUpdaterSyncPaused;
+  if (btn) btn.innerText = isSoftwareUpdaterSyncPaused ? '▶️ Tiếp Tục' : '⏸️ Tạm Dừng';
+}
+
+async function stopSyncProcess() {
+  await fetch('/api/software_updater/control?action=stop');
+}
+
 
 
 

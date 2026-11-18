@@ -2317,6 +2317,36 @@ class ToolkitRequestHandler(SimpleHTTPRequestHandler):
                 ok, msg = ns.flush_dns()
                 return self._send_json({"status": "ok" if ok else "error", "message": msg})
 
+            # 10.1 Quản lý Cập Nhật Bộ Cài Offline & Kiểm Tra Phiên Bản Mới
+            if path == "/api/software_updater/check":
+                from scripts import software_updater as su
+                return self._send_json(su.check_all_software_updates())
+
+            if path == "/api/software_updater/start_sync":
+                from scripts import software_updater as su
+                raw_ids = params.get("apps", ["[]"])[0]
+                try:
+                    app_ids = json.loads(raw_ids)
+                except Exception:
+                    app_ids = None
+                return self._send_json(su.start_sync_plan_async(app_ids))
+
+            if path == "/api/software_updater/progress":
+                from scripts import software_updater as su
+                return self._send_json(su.get_sync_progress_snapshot())
+
+            if path == "/api/software_updater/control":
+                from scripts import software_updater as su
+                act = params.get("action", [""])[0]
+                with su.sync_lock:
+                    if act == "stop":
+                        su.sync_state["stop_requested"] = True
+                    elif act == "pause":
+                        su.sync_state["pause_requested"] = True
+                    elif act == "resume":
+                        su.sync_state["pause_requested"] = False
+                return self._send_json({"status": "ok", "action": act})
+
             # 11. Cấu hình trung tâm (toolkit_config.json) & Quản lý Wi-Fi AP thông minh
             if path == "/api/config/toolkit":
                 from scripts import config_manager as cm
